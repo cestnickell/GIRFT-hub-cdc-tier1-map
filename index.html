@@ -8,7 +8,6 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="css/leaflet-search.css">
         <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
         <style>
         html, body, #map {
@@ -34,9 +33,8 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
-        <script src="js/leaflet-search.js"></script>
         <script src="data/NHSRegionsandICBs_0.js"></script>
-        <script src="data/ElectiveHubs_1.js"></script>
+        <script src="data/Hubs_1.js"></script>
         <script src="data/Tier1Hospitals_2.js"></script>
         <script src="data/CDCs_3.js"></script>
         <script>
@@ -258,7 +256,7 @@
         });
         bounds_group.addLayer(layer_NHSRegionsandICBs_0);
         map.addLayer(layer_NHSRegionsandICBs_0);
-        function pop_ElectiveHubs_1(feature, layer) {
+        function pop_Hubs_1(feature, layer) {
             layer.on({
                 mouseout: function(e) {
                     for (i in e.target._eventParents) {
@@ -280,28 +278,29 @@
                         <td>' + (feature.properties['ICS'] !== null ? autolinker.link(feature.properties['ICS'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Trust</th>\
-                        <td>' + (feature.properties['Trust'] !== null ? autolinker.link(feature.properties['Trust'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">NHS Trust Name</th>\
+                        <td>' + (feature.properties['NHS Trust Name'] !== null ? autolinker.link(feature.properties['NHS Trust Name'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Name</th>\
-                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['Hub Name'] !== null ? autolinker.link(feature.properties['Hub Name'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th scope="row">Date opened</th>\
                         <td>' + (feature.properties['Date opened'] !== null ? autolinker.link(feature.properties['Date opened'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Type</th>\
-                        <td>' + (feature.properties['Type'] !== null ? autolinker.link(feature.properties['Type'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Type of hub</th>\
+                        <td>' + (feature.properties['Type of Hubs'] !== null ? autolinker.link(feature.properties['Type of Hubs'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             layer.bindPopup(popupContent, {maxHeight: 400});
         }
 
-        function style_ElectiveHubs_1_0() {
-            return {
-                pane: 'pane_ElectiveHubs_1',
+        function style_Hubs_1_0(feature) {
+            switch(String(feature.properties['q2wHide_New or Existing'])) {
+                case 'Existing':
+                    return {
+                pane: 'pane_Hubs_1',
                 radius: 10.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -311,30 +310,48 @@
                 weight: 4.0,
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(0,94,184,1.0)',
+                fillColor: 'rgba(31,120,180,1.0)',
                 interactive: true,
             }
+                    break;
+                case 'New':
+                    return {
+                pane: 'pane_Hubs_1',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 4.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(166,206,227,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
         }
-        map.createPane('pane_ElectiveHubs_1');
-        map.getPane('pane_ElectiveHubs_1').style.zIndex = 401;
-        map.getPane('pane_ElectiveHubs_1').style['mix-blend-mode'] = 'normal';
-        var layer_ElectiveHubs_1 = new L.geoJson(json_ElectiveHubs_1, {
+        map.createPane('pane_Hubs_1');
+        map.getPane('pane_Hubs_1').style.zIndex = 401;
+        map.getPane('pane_Hubs_1').style['mix-blend-mode'] = 'normal';
+        var layer_Hubs_1 = new L.geoJson(json_Hubs_1, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_ElectiveHubs_1',
-            layerName: 'layer_ElectiveHubs_1',
-            pane: 'pane_ElectiveHubs_1',
-            onEachFeature: pop_ElectiveHubs_1,
+            dataVar: 'json_Hubs_1',
+            layerName: 'layer_Hubs_1',
+            pane: 'pane_Hubs_1',
+            onEachFeature: pop_Hubs_1,
             pointToLayer: function (feature, latlng) {
                 var context = {
                     feature: feature,
                     variables: {}
                 };
-                return L.circleMarker(latlng, style_ElectiveHubs_1_0(feature));
+                return L.circleMarker(latlng, style_Hubs_1_0(feature));
             },
         });
-        bounds_group.addLayer(layer_ElectiveHubs_1);
-        map.addLayer(layer_ElectiveHubs_1);
+        bounds_group.addLayer(layer_Hubs_1);
+        map.addLayer(layer_Hubs_1);
         function pop_Tier1Hospitals_2(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -477,24 +494,17 @@
         document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
         .title += 'Search for a place';
         var baseMaps = {};
-        L.control.layers(baseMaps,{'<img src="legend/CDCs_3.png" /> CDCs': layer_CDCs_3,'<img src="legend/Tier1Hospitals_2.png" /> Tier 1 Hospitals': layer_Tier1Hospitals_2,'<img src="legend/ElectiveHubs_1.png" /> Elective Hubs': layer_ElectiveHubs_1,'NHS Regions and ICBs<br /><table><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_EastofEngland0.png" /></td><td>East of England</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_London1.png" /></td><td>London</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_Midlands2.png" /></td><td>Midlands</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_NorthEastandYorkshire3.png" /></td><td>North East and Yorkshire</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_NorthWest4.png" /></td><td>North West</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_SouthEast5.png" /></td><td>South East</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_SouthWest6.png" /></td><td>South West</td></tr></table>': layer_NHSRegionsandICBs_0,},{collapsed:false}).addTo(map);
+        L.control.layers(baseMaps,{'<img src="legend/CDCs_3.png" /> CDCs': layer_CDCs_3,'<img src="legend/Tier1Hospitals_2.png" /> Tier 1 Hospitals': layer_Tier1Hospitals_2,'Hubs<br /><table><tr><td style="text-align: center;"><img src="legend/Hubs_1_Existing0.png" /></td><td>Existing</td></tr><tr><td style="text-align: center;"><img src="legend/Hubs_1_New1.png" /></td><td>New</td></tr></table>': layer_Hubs_1,'NHS Regions and ICBs<br /><table><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_EastofEngland0.png" /></td><td>East of England</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_London1.png" /></td><td>London</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_Midlands2.png" /></td><td>Midlands</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_NorthEastandYorkshire3.png" /></td><td>North East and Yorkshire</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_NorthWest4.png" /></td><td>North West</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_SouthEast5.png" /></td><td>South East</td></tr><tr><td style="text-align: center;"><img src="legend/NHSRegionsandICBs_0_SouthWest6.png" /></td><td>South West</td></tr></table>': layer_NHSRegionsandICBs_0,},{collapsed:false}).addTo(map);
         setBounds();
-        map.addControl(new L.Control.Search({
-            layer: layer_ElectiveHubs_1,
-            initial: false,
-            hideMarkerOnCollapse: true,
-            propertyName: 'Name'}));
-        document.getElementsByClassName('search-button')[0].className +=
-         ' fa fa-binoculars';
-        resetLabels([layer_ElectiveHubs_1,layer_Tier1Hospitals_2]);
+        resetLabels([layer_Hubs_1,layer_Tier1Hospitals_2]);
         map.on("zoomend", function(){
-            resetLabels([layer_ElectiveHubs_1,layer_Tier1Hospitals_2]);
+            resetLabels([layer_Hubs_1,layer_Tier1Hospitals_2]);
         });
         map.on("layeradd", function(){
-            resetLabels([layer_ElectiveHubs_1,layer_Tier1Hospitals_2]);
+            resetLabels([layer_Hubs_1,layer_Tier1Hospitals_2]);
         });
         map.on("layerremove", function(){
-            resetLabels([layer_ElectiveHubs_1,layer_Tier1Hospitals_2]);
+            resetLabels([layer_Hubs_1,layer_Tier1Hospitals_2]);
         });
         </script>
     </body>
